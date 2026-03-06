@@ -167,13 +167,16 @@ function runQuiz(lesson) {
 
     document.getElementById('btn-hear-q').onclick = () => {
         const utter = new SpeechSynthesisUtterance(qData.q);
+        utter.lang = 'en-US'; // Forces English pronunciation on foreign devices
         const voices = window.speechSynthesis.getVoices();
         if (voices.length > 0) {
+            let selectedVoice;
             if (storyNum % 2 !== 0) {
-                utter.voice = voices.find(v => v.name.includes("Male") || v.name.includes("David")) || voices[0];
+                selectedVoice = voices.find(v => (v.name.includes("Male") || v.name.includes("David")) && v.lang.startsWith('en'));
             } else {
-                utter.voice = voices.find(v => v.name.includes("Female") || v.name.includes("Zira") || v.name.includes("Google US English")) || voices[0];
+                selectedVoice = voices.find(v => (v.name.includes("Female") || v.name.includes("Zira") || v.name.includes("Google US English")) && v.lang.startsWith('en'));
             }
+            utter.voice = selectedVoice || voices.find(v => v.lang.startsWith('en')) || voices[0];
         }
         utter.onend = () => { document.getElementById('mic-box').classList.remove('hidden'); };
         window.speechSynthesis.speak(utter);
